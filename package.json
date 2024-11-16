@@ -2,9 +2,10 @@
   "name": "node-auth",
   "version": "1.0.0",
   "description": "JWT authentication with Node js, express",
-  "main": "server.js",
+  "main": "server/server.js",
   "scripts": {
-    "dev": "nodemon server.js"
+    "dev": "nodemon server/server.js",
+    "dev:auth": "nodemon server/auth.server.js"
   },
   "repository": {
     "type": "git",
