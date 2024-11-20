@@ -28,8 +28,10 @@ app.post("/auth/login", (req, res) => {
   if (bcrypt.compare(req.body.password, user.password)) {
     // correct user and password
     // create access token for the user for authorization purposes
-    const access_token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET);
-    return res.send({ name: user.name, access_token });
+    const access_token = generateAccessToken(user);
+    const refresh_token = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET); // refreh_token should not have expiry
+    db.refresh_token.push(refresh_token);
+    return res.send({ name: user.name, access_token, refresh_token });
   } else {
     return res.send("Invalid password").status(400);
   }
@@ -53,6 +55,43 @@ function authorize(req, res, next) {
       next();
     });
   }
+}
+
+// get new access_token from refresh_token
+app.get("/auth/token", (req, res) => {
+  const refresh_token = req.headers["refresh_token"];
+  if (!refresh_token) return res.sendStatus(401); // unauthorized
+  if (!db.refresh_token.includes(refresh_token)) return res.sendStatus(403); // this is a logged out user
+  jwt.verify(refresh_token, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+    if (err) {
+      // invalid refresh token
+      return res.sendStatus(403); // don't grant access
+    }
+    return res
+      .send({
+        name: user.name,
+        access_token: generateAccessToken({
+          name: user.name,
+          password: user.password,
+        }),
+      })
+      .status(200);
+  });
+});
+
+// logout user
+app.delete("/auth/logout", (req, res) => {
+  db.refresh_token = db.refresh_token.filter(
+    (token) => token !== req.body.refresh_token
+  );
+  return res.sendStatus(204); // succeeded but not content to send
+});
+
+// access_token utility
+function generateAccessToken(data) {
+  return jwt.sign(data, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: "50s",
+  });
 }
 
 app.listen(process.env.AUTH_PORT, () =>

@@ -1,6 +1,6 @@
 # GET ALL POSTS
 GET http://localhost:5000/posts
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiRGlrc2hpdCIsInBhc3N3b3JkIjoiJDJiJDEwJG1TN3U5ZW5rNnhiY2ZqT0lrT09yS3VFbkNvM20vZW50MU16M1QwdklYVmxWQUZCRVdDdmN1IiwiaWF0IjoxNzMxNzY4MjU3fQ.JIozSakwRPR0kwsdhHg2wophUvRgGX_Q6gaj_c0f088
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiRGlrc2hpdCIsInBhc3N3b3JkIjoiJDJiJDEwJE5WN0VucDg1Z0RmdDRSWW5ROXFoYk8wLm1wNWF6dkRXTDBYcUlTVWhZR2E0NEJ0NEoyWXFDIiwiaWF0IjoxNzMyMDk1NzU3LCJleHAiOjE3MzIwOTU4MDd9.lmsit0LX6ppPGwvJpkarnMx8yfArMM0GijTrsoTd0XA
 
 ###
 
@@ -27,6 +27,24 @@ Content-Type: application/json
 {
     "name": "Dikshit",
     "password": "password"
+}
+
+###
+
+# TOKEN
+
+GET http://localhost:5001/auth/token
+refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiRGlrc2hpdCIsInBhc3N3b3JkIjoiJDJiJDEwJE5WN0VucDg1Z0RmdDRSWW5ROXFoYk8wLm1wNWF6dkRXTDBYcUlTVWhZR2E0NEJ0NEoyWXFDIiwiaWF0IjoxNzMyMDk1NTc4fQ.sBEB6WG7aIV3lNu3ktHwwSsKeKTzQFrhGq8V3HHoEQc
+
+###
+
+# LOGOUT
+
+DELETE http://localhost:5001/auth/logout
+Content-Type: application/json
+
+{
+    "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiRGlrc2hpdCIsInBhc3N3b3JkIjoiJDJiJDEwJE5WN0VucDg1Z0RmdDRSWW5ROXFoYk8wLm1wNWF6dkRXTDBYcUlTVWhZR2E0NEJ0NEoyWXFDIiwiaWF0IjoxNzMyMDk1NTc4fQ.sBEB6WG7aIV3lNu3ktHwwSsKeKTzQFrhGq8V3HHoEQc"
 }
 
 ###

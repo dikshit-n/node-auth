@@ -1,4 +1,5 @@
 let db = {
+  refresh_token: [],
   users: [],
   posts: [],
 };
