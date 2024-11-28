@@ -7,6 +7,7 @@ const jwt = require("jsonwebtoken");
 
 // services import
 const db = require("../db");
+const User = require("../models/user.model");
 
 // setup
 const app = express();
@@ -18,22 +19,37 @@ require("dotenv").config();
 // authentication vs authorization
 // authentication: a process of who a user is
 // authorization: a process of what a user can do
-app.post("/auth/login", (req, res) => {
-  const user = db.users.find((el) => el.name === req.body.name);
+app.post("/auth/login", async (req, res) => {
+  // const user = db.users.find((el) => el.name === req.body.name);
+  let user;
+  try {
+    user = await User.findOne({ name: req.body.name });
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
   if (!user) {
     // user not found
-    return res.send("User Not Found").status(404);
+    return res.status(404).json({ message: "User Not Found" });
   }
   // authenticate
   if (bcrypt.compare(req.body.password, user.password)) {
     // correct user and password
     // create access token for the user for authorization purposes
-    const access_token = generateAccessToken(user);
-    const refresh_token = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET); // refreh_token should not have expiry
+    const access_token = generateAccessToken({
+      name: user.name,
+      _id: user._id,
+    });
+    const refresh_token = jwt.sign(
+      { name: user.name, _id: user._id },
+      process.env.REFRESH_TOKEN_SECRET
+    ); // refreh_token should not have expiry
+    // TODO: store in DB
     db.refresh_token.push(refresh_token);
-    return res.send({ name: user.name, access_token, refresh_token });
+    return res
+      .status(200)
+      .json({ name: user.name, access_token, refresh_token });
   } else {
-    return res.send("Invalid password").status(400);
+    return res.status(400).json({ message: "Invalid password" });
   }
 });
 
@@ -67,15 +83,13 @@ app.get("/auth/token", (req, res) => {
       // invalid refresh token
       return res.sendStatus(403); // don't grant access
     }
-    return res
-      .send({
+    return res.status(200).json({
+      name: user.name,
+      access_token: generateAccessToken({
         name: user.name,
-        access_token: generateAccessToken({
-          name: user.name,
-          password: user.password,
-        }),
-      })
-      .status(200);
+        _id: user._id,
+      }),
+    });
   });
 });
 
